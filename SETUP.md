@@ -31,7 +31,9 @@ VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
 - ✅ **`renderProductGrid()`** - Accessible, responsive product grid
 - ✅ **`addToCart()`** - Add products with clean duplicate handling
 - ✅ **`getCartTotal()`** - Calculate cart total with accurate math
+- ✅ **`initRazorpayCheckout()`** - Secure payment processing
 - ✅ **Shopping Cart** - Full-featured cart with slide-out panel
+- ✅ **Payment Gateway** - Razorpay integration with mock mode
 - ✅ **Cart Badge** - Real-time item count display
 - ✅ **Loading States** - Smooth loading indicators
 - ✅ **Error Handling** - User-friendly error messages with retry
@@ -70,6 +72,12 @@ VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
 - Handles empty cart gracefully
 - Sum of (price × quantity)
 
+**`initRazorpayCheckout(amount, currency, options?)`**
+- Opens Razorpay payment checkout
+- Handles success and failure states
+- Mock mode when not configured
+- Secure payment processing
+
 ### Accessibility Features
 
 - Semantic HTML (`header`, `main`, `nav`, `article`)
@@ -99,7 +107,9 @@ Deploy the `dist` folder to:
 - AWS Amplify
 - Cloudflare Pages
 
-## 🔑 Getting Shopify Credentials
+## 🔑 Getting API Credentials
+
+### Shopify (Optional)
 
 1. Shopify Admin → **Apps** → **Develop apps**
 2. **Create an app**
@@ -108,11 +118,24 @@ Deploy the `dist` folder to:
    - `unauthenticated_read_product_inventory`
 4. Install app and copy credentials
 
+### Razorpay (Optional)
+
+1. Sign up at [Razorpay](https://dashboard.razorpay.com/)
+2. **Settings** → **API Keys** → **Generate Test Keys**
+3. Copy Key ID and Key Secret
+4. Add to `.env` file
+
+**Test Cards:**
+- Success: `4111 1111 1111 1111`
+- Failure: `4000 0000 0000 9995`
+
 ## 💡 Tips
 
-- **No API Key?** The app works perfectly with mock data
+- **No API Keys?** The app works perfectly with mock data and mock payments
 - **Shopping Cart:** Click cart icon to open/close
 - **Add to Cart:** Click blue buttons on product cards
+- **Checkout:** Click "Proceed to Checkout" in cart
+- **Mock Payment:** 90% success rate, 10% failure (for testing)
 - **Cart Badge:** Shows item count in real-time
 - **Dark Mode:** Toggle button in top-right corner
 - **Mobile:** Hamburger menu appears on small screens

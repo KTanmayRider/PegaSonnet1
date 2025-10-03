@@ -2,14 +2,22 @@
  * Shopping Cart Component
  * Accessible slide-out cart panel with full cart management
  * Implements clean UI with mobile-first responsive design
+ * Integrated with Razorpay payment gateway
  */
 
+import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { formatPrice } from '../services/shopify.service';
+import { initRazorpayCheckout } from '../services/razorpay.service';
+import { PaymentResult } from '../types/razorpay.types';
+import { PaymentSuccess } from './PaymentSuccess';
+import { PaymentFailure } from './PaymentFailure';
 
 interface CartProps {
   darkMode: boolean;
 }
+
+type PaymentState = 'idle' | 'processing' | 'success' | 'failure';
 
 export function Cart({ darkMode }: CartProps): JSX.Element {
   const {
@@ -25,6 +33,10 @@ export function Cart({ darkMode }: CartProps): JSX.Element {
   const total = getCartTotal();
   const itemCount = getCartItemCount();
 
+  // Payment state management
+  const [paymentState, setPaymentState] = useState<PaymentState>('idle');
+  const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
+
   // Step 1: Handle quantity change with validation
   const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -39,6 +51,76 @@ export function Cart({ darkMode }: CartProps): JSX.Element {
     if (e.target === e.currentTarget) {
       closeCart();
     }
+  };
+
+  // Step 3: Handle checkout with Razorpay
+  const handleCheckout = async () => {
+    if (itemCount === 0) return;
+
+    setPaymentState('processing');
+
+    try {
+      // Get currency from first item (default to INR)
+      const currency = cart.items[0]?.product.priceRange.minVariantPrice.currencyCode || 'INR';
+
+      // Prepare customer details (can be fetched from user context in production)
+      const customerDetails = {
+        name: 'Customer Name',
+        email: 'customer@example.com',
+        contact: '+919999999999',
+      };
+
+      // Initialize Razorpay checkout
+      const result = await initRazorpayCheckout(total, currency, {
+        name: 'Shopify Store',
+        description: `Purchase of ${itemCount} item${itemCount > 1 ? 's' : ''}`,
+        prefill: customerDetails,
+        notes: {
+          items: itemCount.toString(),
+          total: total.toString(),
+        },
+      });
+
+      setPaymentResult(result);
+
+      if (result.success) {
+        setPaymentState('success');
+        // Clear cart on successful payment
+        clearCart();
+      } else {
+        setPaymentState('failure');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      setPaymentState('failure');
+      setPaymentResult({
+        success: false,
+        amount: total,
+        currency: cart.items[0]?.product.priceRange.minVariantPrice.currencyCode || 'INR',
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
+        timestamp: new Date(),
+      });
+    }
+  };
+
+  // Step 4: Handle payment success close
+  const handleSuccessClose = () => {
+    setPaymentState('idle');
+    setPaymentResult(null);
+    closeCart();
+  };
+
+  // Step 5: Handle payment failure close
+  const handleFailureClose = () => {
+    setPaymentState('idle');
+    setPaymentResult(null);
+  };
+
+  // Step 6: Handle retry payment
+  const handleRetryPayment = () => {
+    setPaymentState('idle');
+    setPaymentResult(null);
+    handleCheckout();
   };
 
   // Step 3: Return null if cart is closed
@@ -403,22 +485,76 @@ export function Cart({ darkMode }: CartProps): JSX.Element {
 
             {/* Checkout Button */}
             <button
+              onClick={handleCheckout}
+              disabled={paymentState === 'processing'}
               className={`
                 w-full py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                 transition-colors focus:outline-none focus:ring-4
+                flex items-center justify-center gap-2
                 ${
-                  darkMode
+                  paymentState === 'processing'
+                    ? darkMode
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : darkMode
                     ? 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500/50'
                     : 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-300'
                 }
               `}
-              aria-label="Proceed to checkout"
+              aria-label={paymentState === 'processing' ? 'Processing payment' : 'Proceed to checkout'}
+              aria-busy={paymentState === 'processing'}
             >
-              Proceed to Checkout
+              {paymentState === 'processing' ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Processing Payment...
+                </>
+              ) : (
+                'Proceed to Checkout'
+              )}
             </button>
           </div>
         )}
       </aside>
+
+      {/* Step 7: Payment Success Modal */}
+      {paymentState === 'success' && paymentResult && (
+        <PaymentSuccess
+          paymentResult={paymentResult}
+          darkMode={darkMode}
+          onClose={handleSuccessClose}
+          onContinueShopping={handleSuccessClose}
+        />
+      )}
+
+      {/* Step 8: Payment Failure Modal */}
+      {paymentState === 'failure' && paymentResult && (
+        <PaymentFailure
+          paymentResult={paymentResult}
+          darkMode={darkMode}
+          onClose={handleFailureClose}
+          onRetry={handleRetryPayment}
+        />
+      )}
     </>
   );
 }

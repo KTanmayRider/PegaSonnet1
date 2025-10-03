@@ -6,6 +6,7 @@ A production-ready, fully accessible React TypeScript storefront powered by Shop
 
 - **🛍️ Shopify Integration**: Full Shopify Storefront API integration with GraphQL
 - **🛒 Shopping Cart**: Full-featured cart with addToCart() and getCartTotal() functions
+- **💳 Razorpay Payments**: Integrated payment gateway with initRazorpayCheckout()
 - **♿ Accessibility First**: WCAG 2.1 AA compliant with ARIA labels, semantic HTML, and keyboard navigation
 - **📱 Mobile Responsive**: Mobile-first design with Tailwind CSS
 - **🌓 Dark Mode**: Elegant dark mode toggle with smooth transitions
@@ -29,16 +30,21 @@ A production-ready, fully accessible React TypeScript storefront powered by Shop
 npm install
 ```
 
-2. **Configure Shopify API (Optional):**
+2. **Configure API Keys (Optional):**
 
 Create a `.env` file in the root directory:
 
 ```env
+# Shopify (optional - uses mock data if not provided)
 VITE_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
 VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
+
+# Razorpay (optional - uses mock payment if not provided)
+VITE_RAZORPAY_KEY_ID=rzp_test_your_key_id
+VITE_RAZORPAY_KEY_SECRET=your_key_secret
 ```
 
-**Note:** If you don't provide API credentials, the app will automatically use mock data.
+**Note:** If you don't provide API credentials, the app will automatically use mock data and mock payments.
 
 3. **Start development server:**
 
@@ -157,6 +163,35 @@ function CartSummary() {
 - Sum of (price × quantity) for all items
 - Type-safe number operations
 
+### `initRazorpayCheckout(amount, currency, options?)`
+
+Initializes Razorpay payment checkout for secure transactions.
+
+```typescript
+import { initRazorpayCheckout } from './services/razorpay.service';
+
+async function checkout() {
+  const result = await initRazorpayCheckout(499, 'INR', {
+    name: 'My Store',
+    description: 'Purchase of 3 items',
+    prefill: {
+      name: 'John Doe',
+      email: 'john@example.com',
+    },
+  });
+  
+  if (result.success) {
+    console.log('Payment successful:', result.paymentId);
+  }
+}
+```
+
+**Features:**
+- Secure payment processing
+- Mock mode when keys not configured
+- Success and failure handling
+- Payment history tracking
+
 ## ♿ Accessibility Features
 
 - **Semantic HTML**: Proper use of `header`, `main`, `nav`, `footer`, `article`
@@ -207,7 +242,9 @@ npm run build
 - AWS Amplify
 - Cloudflare Pages
 
-## 📦 Getting Shopify API Credentials
+## 📦 Getting API Credentials
+
+### Shopify API (Optional)
 
 1. Go to your Shopify Admin
 2. Navigate to **Apps > Develop apps**
@@ -219,11 +256,26 @@ npm run build
    - Store domain (e.g., `your-store.myshopify.com`)
    - Storefront access token
 
+### Razorpay Payment Gateway (Optional)
+
+1. Sign up at [Razorpay Dashboard](https://dashboard.razorpay.com/)
+2. Navigate to **Settings > API Keys**
+3. Click **Generate Test Keys**
+4. Copy:
+   - Key ID (starts with `rzp_test_`)
+   - Key Secret
+5. For production, generate Live Keys
+
+**Test Cards:**
+- Success: `4111 1111 1111 1111`
+- Failure: `4000 0000 0000 9995`
+
 ## 📚 Documentation
 
 - **[README.md](./README.md)** - Main project documentation
 - **[SETUP.md](./SETUP.md)** - Quick setup guide
 - **[CART_DOCUMENTATION.md](./CART_DOCUMENTATION.md)** - Complete cart system documentation
+- **[RAZORPAY_DOCUMENTATION.md](./RAZORPAY_DOCUMENTATION.md)** - Payment integration guide
 
 ## 🤝 Contributing
 

@@ -5,6 +5,7 @@ A production-ready, fully accessible React TypeScript storefront powered by Shop
 ## 🚀 Features
 
 - **🛍️ Shopify Integration**: Full Shopify Storefront API integration with GraphQL
+- **🛒 Shopping Cart**: Full-featured cart with addToCart() and getCartTotal() functions
 - **♿ Accessibility First**: WCAG 2.1 AA compliant with ARIA labels, semantic HTML, and keyboard navigation
 - **📱 Mobile Responsive**: Mobile-first design with Tailwind CSS
 - **🌓 Dark Mode**: Elegant dark mode toggle with smooth transitions
@@ -60,12 +61,16 @@ The app will be available at `http://localhost:3000`
 src/
 ├── components/          # React components
 │   ├── ProductGrid.tsx  # Product grid with renderProductGrid()
+│   ├── Cart.tsx         # Shopping cart panel
 │   ├── LoadingSpinner.tsx
 │   └── ErrorDisplay.tsx
+├── context/            # React Context providers
+│   └── CartContext.tsx  # Cart state with addToCart() & getCartTotal()
 ├── services/           # API and business logic
 │   └── shopify.service.ts  # fetchProducts() and API calls
 ├── types/              # TypeScript type definitions
-│   └── shopify.types.ts
+│   ├── shopify.types.ts
+│   └── cart.types.ts
 ├── App.tsx            # Main application component
 ├── main.tsx           # Application entry point
 └── index.css          # Global styles and Tailwind
@@ -106,6 +111,51 @@ const grid = renderProductGrid(products, darkMode);
 - ARIA labels and semantic HTML
 - Loading and empty states
 - Dark mode support
+
+### `addToCart(product, quantity?)`
+
+Adds a product to the shopping cart with clean duplicate handling.
+
+```typescript
+import { useCart } from './context/CartContext';
+
+function MyComponent() {
+  const { addToCart } = useCart();
+  
+  // Add 1 item
+  addToCart(product);
+  
+  // Add multiple items
+  addToCart(product, 5);
+}
+```
+
+**Features:**
+- Duplicate detection and quantity merging
+- Type-safe operations
+- Automatic badge updates
+- Clean cart logic
+
+### `getCartTotal()`
+
+Calculates the total price of all items in the cart.
+
+```typescript
+import { useCart } from './context/CartContext';
+
+function CartSummary() {
+  const { getCartTotal } = useCart();
+  const total = getCartTotal();
+  
+  return <div>Total: ${total.toFixed(2)}</div>;
+}
+```
+
+**Features:**
+- Accurate decimal calculations
+- Handles empty cart
+- Sum of (price × quantity) for all items
+- Type-safe number operations
 
 ## ♿ Accessibility Features
 
@@ -169,14 +219,20 @@ npm run build
    - Store domain (e.g., `your-store.myshopify.com`)
    - Storefront access token
 
+## 📚 Documentation
+
+- **[README.md](./README.md)** - Main project documentation
+- **[SETUP.md](./SETUP.md)** - Quick setup guide
+- **[CART_DOCUMENTATION.md](./CART_DOCUMENTATION.md)** - Complete cart system documentation
+
 ## 🤝 Contributing
 
 This is a production-ready template. Feel free to:
 - Customize styling and branding
-- Add shopping cart functionality
 - Implement checkout flow
 - Add product filtering and search
 - Integrate payment processing
+- Add user authentication
 
 ## 📄 License
 

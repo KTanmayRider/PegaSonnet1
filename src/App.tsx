@@ -10,6 +10,8 @@ import { fetchProducts } from './services/shopify.service';
 import { ProductGrid } from './components/ProductGrid';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorDisplay } from './components/ErrorDisplay';
+import { Cart } from './components/Cart';
+import { useCart } from './context/CartContext';
 
 // Step 1: Define application state types
 type AppState = 'loading' | 'success' | 'error';
@@ -28,6 +30,10 @@ function App() {
   
   // Mobile menu state for responsive navigation
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+
+  // Cart state from context
+  const { toggleCart, getCartItemCount } = useCart();
+  const cartItemCount = getCartItemCount();
 
   // Step 3: Fetch products on component mount
   // Load products when component initializes and on retry
@@ -137,10 +143,11 @@ function App() {
 
             {/* Actions: Cart and Dark Mode Toggle */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Shopping Cart */}
+              {/* Shopping Cart with Badge */}
               <button
+                onClick={toggleCart}
                 className={`
-                  p-2 sm:p-3 rounded-full transition-colors
+                  relative p-2 sm:p-3 rounded-full transition-colors
                   focus:outline-none focus:ring-4
                   ${
                     darkMode
@@ -148,7 +155,7 @@ function App() {
                       : 'hover:bg-gray-100 focus:ring-gray-300'
                   }
                 `}
-                aria-label="Shopping cart"
+                aria-label={`Shopping cart, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'items'}`}
               >
                 <svg
                   className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
@@ -164,6 +171,16 @@ function App() {
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
+                
+                {/* Cart Badge */}
+                {cartItemCount > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
               </button>
 
               {/* Dark Mode Toggle */}
@@ -517,6 +534,9 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Step 12: Shopping Cart Component */}
+      <Cart darkMode={darkMode} />
     </div>
   );
 }

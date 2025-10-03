@@ -6,6 +6,7 @@
 
 import { ShopifyProduct } from '../types/shopify.types';
 import { formatPrice } from '../services/shopify.service';
+import { useCart } from '../context/CartContext';
 
 interface ProductGridProps {
   products: ShopifyProduct[];
@@ -64,6 +65,9 @@ interface ProductCardProps {
 }
 
 function ProductCard({ product, darkMode }: ProductCardProps): JSX.Element {
+  // Step 1: Get addToCart function from cart context
+  const { addToCart } = useCart();
+  
   const primaryImage = product.images[0];
   const price = formatPrice(
     product.priceRange.minVariantPrice.amount,
@@ -72,6 +76,13 @@ function ProductCard({ product, darkMode }: ProductCardProps): JSX.Element {
 
   // Determine availability status for accessibility
   const availabilityText = product.availableForSale ? 'In stock' : 'Out of stock';
+
+  // Step 2: Handle add to cart with user feedback
+  const handleAddToCart = () => {
+    if (product.availableForSale) {
+      addToCart(product, 1);
+    }
+  };
 
   return (
     <article
@@ -183,6 +194,7 @@ function ProductCard({ product, darkMode }: ProductCardProps): JSX.Element {
           </span>
 
           <button
+            onClick={handleAddToCart}
             className={`
               px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold
               transition-colors duration-200

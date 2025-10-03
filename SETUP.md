@@ -29,6 +29,10 @@ VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
 
 - ✅ **`fetchProducts()`** - Production-ready function with error handling
 - ✅ **`renderProductGrid()`** - Accessible, responsive product grid
+- ✅ **`addToCart()`** - Add products with clean duplicate handling
+- ✅ **`getCartTotal()`** - Calculate cart total with accurate math
+- ✅ **Shopping Cart** - Full-featured cart with slide-out panel
+- ✅ **Cart Badge** - Real-time item count display
 - ✅ **Loading States** - Smooth loading indicators
 - ✅ **Error Handling** - User-friendly error messages with retry
 - ✅ **Accessibility** - WCAG 2.1 AA compliant with ARIA labels
@@ -53,6 +57,18 @@ VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
 - Accessibility with ARIA labels
 - Mobile-first responsive design
 - Returns: `JSX.Element | null`
+
+**`addToCart(product, quantity?)`**
+- Adds product to shopping cart
+- Handles duplicates automatically
+- Updates cart badge in real-time
+- Type-safe with TypeScript
+
+**`getCartTotal()`**
+- Calculates total cart value
+- Returns accurate decimal total
+- Handles empty cart gracefully
+- Sum of (price × quantity)
 
 ### Accessibility Features
 
@@ -95,6 +111,9 @@ Deploy the `dist` folder to:
 ## 💡 Tips
 
 - **No API Key?** The app works perfectly with mock data
+- **Shopping Cart:** Click cart icon to open/close
+- **Add to Cart:** Click blue buttons on product cards
+- **Cart Badge:** Shows item count in real-time
 - **Dark Mode:** Toggle button in top-right corner
 - **Mobile:** Hamburger menu appears on small screens
 - **Accessibility:** Full keyboard navigation support

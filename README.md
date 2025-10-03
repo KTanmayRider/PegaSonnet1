@@ -16,6 +16,8 @@ A production-ready, fully accessible React TypeScript storefront powered by Shop
 - **🧪 Mock Data**: Built-in mock data for development and testing
 - **♻️ Error Handling**: Comprehensive error handling with user-friendly messages
 - **🔄 Loading States**: Smooth loading indicators for better UX
+- **🧪 Unit Tests**: 150+ tests with Jest & React Testing Library
+- **🔬 Test Coverage**: 90%+ coverage across all modules
 
 ## 📋 Prerequisites
 
@@ -60,6 +62,10 @@ The app will be available at `http://localhost:3000`
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npm test` - Run all tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Generate coverage report
+- `npm run test:ci` - Run tests in CI mode
 
 ## 📁 Project Structure
 
@@ -276,6 +282,7 @@ npm run build
 - **[SETUP.md](./SETUP.md)** - Quick setup guide
 - **[CART_DOCUMENTATION.md](./CART_DOCUMENTATION.md)** - Complete cart system documentation
 - **[RAZORPAY_DOCUMENTATION.md](./RAZORPAY_DOCUMENTATION.md)** - Payment integration guide
+- **[TESTING.md](./TESTING.md)** - Complete testing documentation
 
 ## 🤝 Contributing
 
